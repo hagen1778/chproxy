@@ -1,0 +1,13 @@
+server:
+  https:
+    autocert:
+      cache_dir: "cache_dir"
+
+users:
+  - name: "dummy"
+    to_cluster: "cluster"
+    to_user: "default"
+
+clusters:
+  - name: "cluster"
+    nodes: ["127.0.1.1:8123"]

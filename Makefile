@@ -1,21 +1,39 @@
 pkgs = $(shell go list ./...)
 
-install:
-	go get golang.org/x/crypto/acme/autocert
-	go get github.com/prometheus/client_golang/prometheus
-	go get gopkg.in/yaml.v2
+BUILD_TAG = $(shell git tag --points-at HEAD)
+
+BUILD_CONSTS = \
+	-X main.buildTime=`date -u '+%Y-%m-%d_%H:%M:%S'` \
+	-X main.buildRevision=`git rev-parse HEAD` \
+	-X main.buildTag=$(BUILD_TAG)
+
+BUILD_OPTS = -ldflags="$(BUILD_CONSTS)" -gcflags="-trimpath=$(GOPATH)/src"
+
+update:
+	dep ensure -update
 
 format:
+	dep ensure
 	go fmt $(pkgs)
+	gofmt -w -s .
 
 build:
 	go build
 
 test: build
-	go test -race -v $(pkgs)
+	go test -race $(pkgs)
 
 run: build
-	./chproxy
+	./chproxy -config=testdata/http.yml
+
+lint:
+	go vet $(pkgs)
+	go list ./... | grep -v /vendor/ | xargs -L1 golint
 
 reconfigure:
 	kill -HUP `pidof chproxy`
+
+release: format lint test
+	rm -f chproxy
+	GOOS=linux GOARCH=amd64 go build $(BUILD_OPTS)
+	tar czf chproxy-linux-amd64-$(BUILD_TAG).tar.gz chproxy

@@ -1,0 +1,14 @@
+server:
+  http:
+    listen_addr: ":8080"
+
+users:
+  - name: "dummy"
+    to_cluster: "cluster"
+    to_user: "default"
+    deny_http: true
+    deny_https: true
+
+clusters:
+  - name: "cluster"
+    nodes: ["127.0.1.1:8123"]

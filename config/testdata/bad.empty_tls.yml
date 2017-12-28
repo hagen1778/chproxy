@@ -1,9 +1,0 @@
-server:
-  listen_addr: ":9090"
-  is_tls: true
-  tls_config:
-
-users:
-  - name: "default"
-    to_cluster: "cluster"
-    to_user: "default"

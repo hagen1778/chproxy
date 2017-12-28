@@ -1,16 +1,10 @@
 language: go
 
 go:
-  - 1.9
-
-install:
-  - make install
+  - 1.9.x
 
 script:
   # build test for supported platforms
   - GOOS=linux go build
-  - GOOS=darwin go build
-  - GOOS=freebsd go build
-  - GOARCH=386 go build
 
   - make test
